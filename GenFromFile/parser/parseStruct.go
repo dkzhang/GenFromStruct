@@ -1,6 +1,7 @@
-package parseStruct
+package parser
 
 import (
+	"GenFromStruct/GenFromFile/model"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -9,12 +10,31 @@ import (
 	"os"
 )
 
-func Parse(filename string) (ssInfo []StructInfo) {
+func Parse(filename string) (sfi model.StructFileInfo) {
+	fName, isMatch := extractFileName(filename)
+	if !isMatch {
+		log.Fatalf("filename %s is not match", filename)
+	}
+
 	f, err := parseFile(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return parseStruct(f)
+
+	ims := make([]string, len(f.Imports))
+	for i, s := range f.Imports {
+		ims[i] = s.Path.Value
+	}
+
+	ssInfo := parseStruct(f)
+	sfi = model.StructFileInfo{
+		OriginFileName: filename,
+		FileName:       fName,
+		PackageName:    f.Name.Name,
+		Imports:        ims,
+		Structs:        ssInfo,
+	}
+	return sfi
 }
 
 func parseFile(filename string) (f *ast.File, err error) {
@@ -35,7 +55,7 @@ func parseFile(filename string) (f *ast.File, err error) {
 
 }
 
-func parseStruct(f *ast.File) (ssInfo []StructInfo) {
+func parseStruct(f *ast.File) (ssInfo []model.StructInfo) {
 	for _, decl := range f.Decls {
 		if s, ok := decl.(*ast.GenDecl); ok {
 			for _, spec := range s.Specs {
@@ -46,15 +66,14 @@ func parseStruct(f *ast.File) (ssInfo []StructInfo) {
 						log.Printf("sName = %s, isMatch = %v \n", sName, isMatch)
 
 						if isMatch {
-							sInfo := StructInfo{
-								Name:   sName,
-								Fields: make([]StructField, len(st.Fields.List)),
+							sInfo := model.StructInfo{
+								ClassName: sName,
+								Fields:    make([]model.StructField, len(st.Fields.List)),
 							}
 							for j, field := range st.Fields.List {
-								sInfo.Fields[j] = StructField{
+								sInfo.Fields[j] = model.StructField{
 									Name:    field.Names[0].Name,
-									Tag:     field.Tag.Value,
-									TagMap:  extractTag(field.Tag.Value),
+									TagMap:  extractTag(field.Tag),
 									Comment: field.Comment.Text(),
 								}
 								switch field.Type.(type) {
