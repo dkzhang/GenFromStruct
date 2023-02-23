@@ -36,3 +36,7 @@ func CamelToSnake(s string) string {
 
 	return sb.String()
 }
+
+func Camel2camel(s string) string {
+	return strings.ToLower(s[:1]) + s[1:]
+}

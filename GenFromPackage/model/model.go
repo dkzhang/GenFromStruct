@@ -3,14 +3,13 @@ package model
 import "go/types"
 
 type StructField struct {
-	Name    string
-	Type    types.Type
-	TagMap  map[string]string
-	Comment string
+	Name   string
+	Type   types.Type
+	TagMap map[string]string
 }
 
 type StructInfo struct {
-	ClassName string
-	TableName string
-	Fields    []StructField
+	StructName string
+	TableName  string
+	Fields     []StructField
 }

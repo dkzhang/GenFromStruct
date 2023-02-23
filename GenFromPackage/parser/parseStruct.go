@@ -4,6 +4,7 @@ import (
 	"GenFromStruct/GenFromPackage/model"
 	"fmt"
 	"go/types"
+	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -11,7 +12,7 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-func Parse(sourceType string) (model.StructInfo, string, *types.Struct) {
+func Parse(sourceType string) model.StructInfo {
 	// 1. Split source type into package and type name
 	sourceTypePackage, sourceTypeName := splitSourceType(sourceType)
 
@@ -36,8 +37,8 @@ func Parse(sourceType string) (model.StructInfo, string, *types.Struct) {
 	}
 
 	si := model.StructInfo{
-		ClassName: sourceTypeName,
-		Fields:    make([]model.StructField, structType.NumFields()),
+		StructName: extractStructName(sourceTypeName),
+		Fields:     make([]model.StructField, structType.NumFields()),
 	}
 
 	// 6. Now we can iterate through fields and access tags
@@ -48,7 +49,7 @@ func Parse(sourceType string) (model.StructInfo, string, *types.Struct) {
 			TagMap: extractTag(structType.Tag(i)),
 		}
 	}
-	return si, sourceTypeName, structType
+	return si
 }
 
 func loadPackage(path string) *packages.Package {
@@ -90,4 +91,15 @@ func extractTag(tag string) map[string]string {
 		}
 	}
 	return m
+}
+
+func extractStructName(structName string) string {
+	re := regexp.MustCompile(`(\w+)_ToG`)
+	matches := re.FindStringSubmatch(structName)
+	if len(matches) > 1 {
+		return matches[1]
+	} else {
+		log.Fatal("No match found for struct name")
+		return ""
+	}
 }

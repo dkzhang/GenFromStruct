@@ -3,6 +3,7 @@ package main
 import (
 	"GenFromStruct/GenFromPackage/generator"
 	"GenFromStruct/GenFromPackage/parser"
+	"GenFromStruct/GenFromPackage/processor"
 	"fmt"
 	"go/types"
 	"os"
@@ -14,8 +15,7 @@ import (
 
 func main() {
 	// ...
-	si, sourceTypeName, structType := parser.Parse("GenFromStruct/sampleData/mypack.Project_ToG")
-	fmt.Printf("si: %+v \n", si)
+	si := parser.Parse("GenFromStruct/sampleData/mypack.Project_ToG") //si := parser.Parse("GenFromStruct/sampleData/mypack.Project_ToG")
 
 	os.Setenv("GOPACKAGE", "project")
 
@@ -24,9 +24,10 @@ func main() {
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
-	fmt.Printf("sourceTypeName: %+v \n", sourceTypeName)
-	fmt.Printf("structType: %+v \n", structType)
-	generator.GenerateModelChangeSet(si)
+
+	psi := processor.ProcessTag(si)
+	generator.GenerateModel(psi)
+	//generator.GenerateModelChangeSet(psi)
 }
 
 func generate(sourceTypeName string, structType *types.Struct) error {
