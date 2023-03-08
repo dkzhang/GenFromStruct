@@ -28,7 +28,7 @@ func ProcessTag(sfi model.StructFileInfo) (psfi model.StructFileInfo) {
 			}
 
 			fieldName := utils.CamelToSnake(sfi.Structs[s].Fields[f].Name)
-			fieldPgType := utils.go2Pg[sfi.Structs[s].Fields[f].Type]
+			fieldPgType := utils.Go2Pg[sfi.Structs[s].Fields[f].Type]
 
 			for k, v := range sfi.Structs[s].Fields[f].TagMap {
 				psfi.Structs[s].Fields[f].TagMap[k] = v

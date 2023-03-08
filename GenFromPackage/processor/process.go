@@ -7,9 +7,11 @@ import (
 
 func ProcessTag(si model.StructInfo) (psi model.StructInfo) {
 	psi = model.StructInfo{
-		StructName: si.StructName,
-		TableName:  utils.CamelToSnake(si.StructName),
-		Fields:     make([]model.StructField, len(si.Fields)),
+		PackagePath: si.PackagePath,
+		FilePath:    si.FilePath,
+		StructName:  si.StructName,
+		TableName:   utils.CamelToSnake(si.StructName),
+		Fields:      make([]model.StructField, len(si.Fields)),
 	}
 
 	for f := range si.Fields {

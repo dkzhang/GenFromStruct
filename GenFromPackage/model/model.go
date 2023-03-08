@@ -9,6 +9,9 @@ type StructField struct {
 }
 
 type StructInfo struct {
+	PackagePath string
+	FilePath    string
+
 	StructName string
 	TableName  string
 	Fields     []StructField

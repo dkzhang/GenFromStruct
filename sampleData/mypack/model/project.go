@@ -54,3 +54,28 @@ const SchemaProject = `
 			updated_at	TIMESTAMP WITH TIME ZONE, 
 ); 
 `
+
+var FieldMapProject = map[string]string{
+	"project_id":            "int",
+	"project_name":          "string",
+	"project_code":          "string",
+	"department_code":       "string",
+	"department":            "string",
+	"chief_id":              "int",
+	"chief_cn_name":         "string",
+	"extra_info":            "string",
+	"basic_status":          "int",
+	"start_date":            "time.Time",
+	"total_days_apply":      "int",
+	"end_reminder_at":       "time.Time",
+	"cpu_nodes_expected":    "int",
+	"gpu_nodes_expected":    "int",
+	"storage_size_expected": "int",
+	"cpu_nodes_acquired":    "int",
+	"gpu_nodes_acquired":    "int",
+	"storage_size_acquired": "int",
+	"account_alloc_info":    "string",
+	"storage_alloc_info":    "string",
+	"created_at":            "time.Time",
+	"updated_at":            "time.Time",
+}

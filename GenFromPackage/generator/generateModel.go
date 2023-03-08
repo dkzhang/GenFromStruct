@@ -14,8 +14,8 @@ import (
 )
 
 func GenerateModel(si model.StructInfo) error {
-	basePath := "./"
-	modelPath := filepath.Join(basePath, "model")
+
+	modelPath := filepath.Join(si.FilePath, "model")
 	modelFileName := filepath.Join(modelPath, utils.Camel2camel(si.StructName)+".go")
 
 	// make path if not exist
@@ -40,6 +40,7 @@ func GenerateModel(si model.StructInfo) error {
 		return fmt.Errorf("error saving model file: %v", err)
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////
 	// Generate schema
 	buf := genSchema(si)
 
@@ -56,7 +57,18 @@ func GenerateModel(si model.StructInfo) error {
 		log.Printf("formatting source: %s", err)
 		src = buf.Bytes()
 	}
+	if _, err = file.Write(src); err != nil {
+		return fmt.Errorf("error writing schema to model file: %v", err)
+	}
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Generate FieldMap
+	buf = genFieldMap(si)
+	src, err = format.Source(buf.Bytes())
+	if err != nil {
+		log.Printf("formatting source: %s", err)
+		src = buf.Bytes()
+	}
 	if _, err = file.Write(src); err != nil {
 		return fmt.Errorf("error writing schema to model file: %v", err)
 	}
@@ -89,7 +101,7 @@ func genSchema(si model.StructInfo) bytes.Buffer {
 }
 
 func genStruct(si model.StructInfo, f *File) error {
-	changeSetFields := make([]Code, len(si.Fields))
+	structFields := make([]Code, len(si.Fields))
 
 	// Iterate over struct fields
 	for i := 0; i < len(si.Fields); i++ {
@@ -116,11 +128,33 @@ func genStruct(si model.StructInfo, f *File) error {
 		tags["db"] = field.TagMap["db"]
 		code.Tag(tags)
 
-		changeSetFields[i] = code
+		structFields[i] = code
 	}
 
 	// Generate struct type
-	f.Type().Id(si.StructName).Struct(changeSetFields...)
+	f.Type().Id(si.StructName).Struct(structFields...)
 
 	return nil
+}
+
+func genFieldMap(si model.StructInfo) bytes.Buffer {
+	var buf bytes.Buffer
+	fmt.Fprintf(&buf, " \n")
+	fmt.Fprintf(&buf, "var FieldMap%s = map[string]string{ \n", si.StructName)
+	for _, f := range si.Fields {
+		fieldType := ""
+		switch v := f.Type.(type) {
+		case *types.Basic:
+			fieldType = v.String()
+		case *types.Named:
+			typeName := v.Obj()
+			fieldType = typeName.Pkg().Path() + "." + typeName.Name()
+		default:
+			log.Fatalf("struct field type not hanled: %T", v)
+		}
+
+		fmt.Fprintf(&buf, "\t\t\t\"%s\": \"%s\", \n", f.TagMap["json"], fieldType)
+	}
+	fmt.Fprintf(&buf, "} \n\n")
+	return buf
 }

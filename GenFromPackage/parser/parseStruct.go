@@ -12,7 +12,7 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-func Parse(sourceType string) model.StructInfo {
+func Parse(sourceType string, filePath string) model.StructInfo {
 	// 1. Split source type into package and type name
 	sourceTypePackage, sourceTypeName := splitSourceType(sourceType)
 
@@ -37,8 +37,10 @@ func Parse(sourceType string) model.StructInfo {
 	}
 
 	si := model.StructInfo{
-		StructName: extractStructName(sourceTypeName),
-		Fields:     make([]model.StructField, structType.NumFields()),
+		PackagePath: sourceTypePackage,
+		FilePath:    filePath,
+		StructName:  extractStructName(sourceTypeName),
+		Fields:      make([]model.StructField, structType.NumFields()),
 	}
 
 	// 6. Now we can iterate through fields and access tags
