@@ -8,7 +8,7 @@ import (
 
 type Project_ToG struct {
 	// Static 8
-	ProjectID        int    `pgType:"SERIAL" pgA:"PRIMARY KEY" db:"project_id" json:"project_id"`
+	ID               int    `pgType:"SERIAL" pgA:"PRIMARY KEY" db:"project_id" json:"project_id"`
 	ProjectName      string `pgType:"varchar(256)" db:"project_name" json:"project_name"`
 	ProjectCode      string `pgType:"varchar(32)" db:"project_code" json:"project_code"`
 	DepartmentCode   string `db:"department_code" json:"department_code"`

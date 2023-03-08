@@ -4,7 +4,7 @@ package model
 import "time"
 
 type ProjectPtr struct {
-	ProjectID           *int       `db:"project_id" json:"project_id"`
+	ID                  *int       `db:"project_id" json:"project_id"`
 	ProjectName         *string    `db:"project_name" json:"project_name"`
 	ProjectCode         *string    `db:"project_code" json:"project_code"`
 	DepartmentCode      *string    `db:"department_code" json:"department_code"`
@@ -30,8 +30,8 @@ type ProjectPtr struct {
 
 func (c ProjectPtr) ToDbMap() map[string]interface{} {
 	m := make(map[string]interface{})
-	if c.ProjectID != nil {
-		m["project_id"] = *c.ProjectID
+	if c.ID != nil {
+		m["project_id"] = *c.ID
 	}
 	if c.ProjectName != nil {
 		m["project_name"] = *c.ProjectName

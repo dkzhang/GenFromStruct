@@ -4,7 +4,7 @@ package model
 import "time"
 
 type Project struct {
-	ProjectID           int       `db:"project_id" json:"project_id"`
+	ID                  int       `db:"project_id" json:"project_id"`
 	ProjectName         string    `db:"project_name" json:"project_name"`
 	ProjectCode         string    `db:"project_code" json:"project_code"`
 	DepartmentCode      string    `db:"department_code" json:"department_code"`
