@@ -80,7 +80,7 @@ func GenerateModelPtr(si model.StructInfo) error {
 	// 5. Build toMap method
 	f.Func().Params(
 		Id("c").Id(changeSetName),
-	).Id("toDbMap").Params().Map(String()).Interface().Block(
+	).Id("ToDbMap").Params().Map(String()).Interface().Block(
 		toMapBlock...,
 	)
 

@@ -28,21 +28,26 @@ func GenerateDbOps(si model.StructInfo) error {
 
 	// 2. Build "m := make(map[string]interface{})"
 	//InsertOpsBlock = append(InsertOpsBlock, Id("m").Op(":=").Make(Map(String()).Interface()))
+	structPtrName := si.StructName + "Ptr"
 
-	//code := Id("").Op(":=").Qual("github.com/jmoiron/sqlx", "Insert").
-	//	Call(Id(utils.Camel2camel(si.StructName))).Id
-	//	Call(Id("runner"))
-	//
-	//InsertOpsBlock = append(InsertOpsBlock, code)
+	code := List(Id("_"), Id("err")).Op(":=").
+		Qual("github.com/Masterminds/squirrel", "Insert").
+		Call(Lit(si.TableName)).
+		Dot("SetMap").Call(Id(utils.Camel2camel(structPtrName)).Dot("ToDbMap").Call()).
+		Dot("RunWith").Call(Id("runner")).
+		Dot("PlaceholderFormat").Call(Id("squirrel.Dollar")).
+		Dot("ExecContext").Call(Id("ctx"))
+
+	InsertOpsBlock = append(InsertOpsBlock, code)
 
 	// 4. Build return statement
-	InsertOpsBlock = append(InsertOpsBlock, Return(Nil()))
+	InsertOpsBlock = append(InsertOpsBlock, Return(Id("err")))
 
-	// 5. Build toMap method
+	// 5. Build Insert method
 	f.Func().Id("Insert"+si.StructName).
 		Params(Id("ctx").Qual("context", "Context"),
 			Id("runner").Qual("github.com/Masterminds/squirrel", "BaseRunner"),
-			Id(utils.Camel2camel(si.StructName)).Qual(si.PackagePath+"/model", si.StructName),
+			Id(utils.Camel2camel(structPtrName)).Qual(si.PackagePath+"/model", structPtrName),
 		).Error().Block(
 		InsertOpsBlock...,
 	)

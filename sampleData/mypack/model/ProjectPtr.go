@@ -28,7 +28,7 @@ type ProjectPtr struct {
 	UpdatedAt           *time.Time `db:"updated_at" json:"updated_at"`
 }
 
-func (c ProjectPtr) toDbMap() map[string]interface{} {
+func (c ProjectPtr) ToDbMap() map[string]interface{} {
 	m := make(map[string]interface{})
 	if c.ProjectID != nil {
 		m["project_id"] = *c.ProjectID
